@@ -2,11 +2,19 @@
 
 
 
+
+
 ## 接口说明
 
-悟能作诗基于智谱自主研发的语言模型，可根据用户输入的主题、诗人，自动创作诗歌。
+悟道写诗基于智谱自主研发的语言模型，可根据用户输入的主题、诗人，自动创作诗歌。
 
-该接口为异步接口，开发者首先通过write_poem接口获取task_id，然后调用查看任务状态接口获取异步处理后的结果。
+调用请求发送成功后进入等待队列，待模型运行结束即可获取写诗结果，返回结果时间受排队任务量的影响，平均等待时间为6分钟。该接口为异步接口，开发者首先通过write_poem接口获取task_id，然后通过调用查看任务状态接口获取模型运行结果。
+
+
+
+&nbsp;
+< img src="https://lfs.aminer.cn//misc/pretrain/process.jpg" width="30%" height="30%">
+
 
 
 
@@ -22,8 +30,10 @@
 | 响应格式  | 统一采用JSON格式 |
 | 开发语言  | 任意，只要可以向服务发起HTTP请求的均可 |
 | 适用范围  | 任意操作系统，但因不支持跨域不适用于浏览器，请在后端调用接口 |
-| 请求行  | POST /v2/its HTTP/1.1 |
+| 请求行  | POST /v1/poem HTTP/1.1 |
 | 平均响应时间  | 6min |
+
+
 
 
 
@@ -34,11 +44,13 @@
 
 
 
+
+
 ## 请求参数
 
 在调用业务接口时，都需要在 Http Request Body 中配置以下参数，请求数据均为json字符串。
 
-参数apikey和参数apisecret经过apiName、appKey和appSecret拼接，再通过DES3+base64加密解密。
+参数apikey和参数apisecret经过apiName、appKey和appSecret拼接，再通过DES3+base64加密解密，您需要在控制台里获取具体的值。
 
 |  参数名   | 类型  |  必传   | 描述  |
 |  ----  | ----  |  ----  | ----  |
@@ -60,6 +72,8 @@
         "apisecret": "NSY1MDA0ZWJmMjE1NjM0MzBjOWI5MTNhNTFkYzYyZTYzMQ=="
   }
 ```
+
+
 
 
 
@@ -110,15 +124,6 @@ result字段：
 
 
 
-## 错误码
-
-| 错误码 | 错误描述                          |
-| ------ | --------------------------------- |
-| 10001  | apikey和apisecret与当前接口不匹配 |
-| 10002  | apikey校验不成功                  |
-| 10003  | 接口速率超限制                    |
-| 10004  | 接口周期次数超限制                |
-
 
 
 ## 查看任务状态接口
@@ -131,20 +136,10 @@ result字段：
 | ------------ | ------------------------------------------------------------ |
 | 传输方式     | http[s] （为提高安全性，强烈推荐https）                      |
 | 请求地址     | https://gpt.aminer.cn/v1/status (注：服务器IP不固定，为保证您的接口稳定，请勿通过指定IP的方式调用接口，使用域名方式调用) |
-| 字符编码     | UTF-8                                                        |
-| 响应格式     | 统一采用JSON格式                                             |
-| 开发语言     | 任意，只要可以向服务发起HTTP请求的均可                       |
-| 适用范围     | 任意操作系统，但因不支持跨域不适用于浏览器，请在后端调用接口 |
-| 请求行       | GET /v2/its HTTP/1.1                                         |
+| 请求行       | GET /v1/status HTTP/1.1                                      |
 | 平均响应时间 | 1s                                                           |
 
 
-
-### 接口调用流程
-
- + 向服务器端发送Http请求后，接收服务器端的返回结果。
-
-   
 
 ### 请求参数
 
@@ -239,3 +234,25 @@ result字段：
 }
 ```
 
+
+
+
+
+## 错误码
+
+| 错误码 | 错误描述                          |
+| ------ | --------------------------------- |
+| 10001  | apikey和apisecret与当前接口不匹配 |
+| 10002  | apikey校验不成功                  |
+| 10003  | 接口速率超限制                    |
+| 10004  | 接口周期次数超限制                |
+| 10005  | speed必须为normal                 |
+| 10006  | author应包含中文                  |
+
+
+
+
+
+## 代码示例
+
+目前提供[python](https://lfs.aminer.cn//misc/pretrain//write_poem/write_poem_python.py)、[java](https://lfs.aminer.cn//misc/pretrain//write_poem/write_poem_java.java)、[c++](https://lfs.aminer.cn//misc/pretrain//write_poem/write_poem_c++.cpp)的API调用demo。

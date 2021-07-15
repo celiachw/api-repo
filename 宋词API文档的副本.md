@@ -2,11 +2,21 @@
 
 
 
+
+
 ## 接口说明
 
 悟能作诗基于智谱自主研发的语言模型，可根据用户输入的主题、诗人、词牌名，自动创作宋词。
 
-该接口为异步接口，开发者首先通过write_poem_song接口获取task_id，然后调用查看任务状态接口获取异步处理后的结果。
+调用请求发送成功后进入等待队列，待模型运行结束即可获取写诗结果，返回结果时间受排队任务量的影响，平均等待时间为6-15分钟，具体取决于词牌名的长度。该接口为异步接口，开发者首先通过write_poem_song接口获取task_id，然后调用查看任务状态接口获取异步处理后的结果。
+
+
+
+&nbsp;
+< img src="https://lfs.aminer.cn//misc/pretrain/process.jpg" width="30%" height="30%">
+
+
+
 
 
 
@@ -22,8 +32,10 @@
 | 响应格式  | 统一采用JSON格式 |
 | 开发语言  | 任意，只要可以向服务发起HTTP请求的均可 |
 | 适用范围  | 任意操作系统，但因不支持跨域不适用于浏览器，请在后端调用接口 |
-| 请求行  | POST /v2/its HTTP/1.1 |
+| 请求行  | POST /v1/poem HTTP/1.1 |
 | 平均响应时间  | 6-15 min (取决于词牌名的词长度) |
+
+
 
 
 
@@ -31,6 +43,8 @@
 
  + 将请求参数以及图片数据放在Http Request Body中，以POST表单的形式提交，详见下方 **请求参数** 。
  + 向服务器端发送Http请求后，接收服务器端的返回结果。
+
+
 
 
 
@@ -62,6 +76,8 @@
         "apisecret": "NSY1MDA0ZWJmMjE1NjM0MzBjOWI5MTNhNTFkYzYyZTYzMQ=="
   }
 ```
+
+
 
 
 
@@ -112,15 +128,6 @@ result字段：
 
 
 
-## 错误码
-
-| 错误码 | 错误描述                          |
-| ------ | --------------------------------- |
-| 10001  | apikey和apisecret与当前接口不匹配 |
-| 10002  | apikey校验不成功                  |
-| 10003  | 接口速率超限制                    |
-| 10004  | 接口周期次数超限制                |
-
 
 
 ## 查看任务状态接口
@@ -133,20 +140,10 @@ result字段：
 | ------------ | ------------------------------------------------------------ |
 | 传输方式     | http[s] （为提高安全性，强烈推荐https）                      |
 | 请求地址     | https://gpt.aminer.cn/v1/status (注：服务器IP不固定，为保证您的接口稳定，请勿通过指定IP的方式调用接口，使用域名方式调用) |
-| 字符编码     | UTF-8                                                        |
-| 响应格式     | 统一采用JSON格式                                             |
-| 开发语言     | 任意，只要可以向服务发起HTTP请求的均可                       |
-| 适用范围     | 任意操作系统，但因不支持跨域不适用于浏览器，请在后端调用接口 |
-| 请求行       | GET /v2/its HTTP/1.1                                         |
+| 请求行       | GET /v1/status HTTP/1.1                                      |
 | 平均响应时间 | 1s                                                           |
 
 
-
-### 接口调用流程
-
- + 向服务器端发送Http请求后，接收服务器端的返回结果。
-
-   
 
 ### 请求参数
 
@@ -240,4 +237,27 @@ result字段：
     "status": 0
 }
 ```
+
+
+
+
+
+## 错误码
+
+| 错误码 | 错误描述                          |
+| ------ | --------------------------------- |
+| 10001  | apikey和apisecret与当前接口不匹配 |
+| 10002  | apikey校验不成功                  |
+| 10003  | 接口速率超限制                    |
+| 10004  | 接口周期次数超限制                |
+| 10005  | speed必须为normal                 |
+| 10006  | author应包含中文                  |
+
+
+
+
+
+## 代码示例
+
+目前提供[python](https://lfs.aminer.cn//misc/pretrain//write_poem_song/write_poem_song_python.py)、[java](https://lfs.aminer.cn//misc/pretrain//write_poem_song/write_poem_song_java.java)、[c++](https://lfs.aminer.cn//misc/pretrain//write_poem_song/write_poem_song_c++.cpp)的API调用demo。
 
